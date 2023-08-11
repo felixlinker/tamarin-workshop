@@ -1,0 +1,32 @@
+theory TCPHandShake
+begin
+
+rule SYN:
+  []
+  --[ Begin() ]->
+  [ St_AliceWait(), Out('SYN') ]
+
+rule SYNACK:
+  [ In('SYN') ]
+  -->
+  [ St_BobWait(), Out('SYNACK') ]
+
+rule ACK:
+  [ St_AliceWait(), In('SYNACK') ]
+  -->
+  [ Out('ACK') ]
+
+rule FIN:
+  [ St_BobWait(), In('ACK') ]
+  --[ End() ]->
+  []
+
+lemma Works:
+  exists-trace
+  "Ex #t1 #t2. Begin() @ #t1 & End() @ #t2"
+
+lemma BulletProof:
+  all-traces
+  "All #t1. Begin() @ #t1 ==> Ex #t2. End() @ #t2 & #t1 < #t2"
+
+end
