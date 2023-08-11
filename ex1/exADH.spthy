@@ -1,0 +1,64 @@
+theory ExerciseADH
+begin
+
+builtins: symmetric-encryption, diffie-hellman
+
+rule Ltk:
+  // let publicComponent = _^_ in
+  []
+  -->
+  []
+
+rule A_Init:
+  []
+  --[ ReachAInit() ]->
+  [ // Out(...)
+  // , St_A(...)
+  ]
+
+rule B_Init:
+  // let sharedKey = _^_ in
+  [ // In(...)
+  ]
+  --[ ReachBInit()
+    // , ResponderKey(_)
+    ]->
+  [ // Out(...)
+  ]
+
+rule A_SendMsg:
+  // let sharedKey = _^_ in
+  [ // In(...)
+  // , St_A(...)
+  ]
+  --[ ReachASendMsg()
+    // SendMsg(_)
+    // , InitiatorKey(_)
+    ]->
+  [ // Out(...)
+  ]
+
+// This restriction allows you to use the Eq action fact in rules to constrain
+// that two terms must be equal. This is used two "compare" two messages or
+// terms, e.g., to check that signature verification is equal to true.
+// This rule is only commented out right now to suppress a warning that Eq is
+// referenced but not used. Un-comment it whenever you want!
+// restriction Eq:
+//   "All t1 t2 #x. Eq(t1, t2) @ #x ==> t1 = t2"
+
+lemma Executability:
+  exists-trace
+  "Ex #t1 #t2 #t3. ReachAInit() @ #t1 & ReachBInit() @ #t2 & ReachASendMsg() @ #t3"
+
+// K(m) @ #t means that the adversary knows message m at timepoint #t.
+// Again, the following lemmas are commented out to suppress warnings.
+// lemma ResponderKeySecrecy:
+//   "All k #t. ResponderKey(k) @ #t ==> not Ex #x. K(k) @ #x"
+
+// lemma InitiatorKeySecrecy:
+//   "All k #t. InitiatorKey(k) @ #t ==> not Ex #x. K(k) @ #x"
+
+// lemma SendMsgSecrecy:
+//   "All m #t. SendMsg(m) @ #t ==> not Ex #x. K(m) @ #x"
+
+end

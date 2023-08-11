@@ -39,7 +39,9 @@ Now to the exercise...
 The protocol above assumes that Alice and Bob have access to authentic public keys.
 Start by implementing the rule `Ltk`, which should model a participant generating a fresh public-private key pair.
 
-You can use the hints below if you get stuck.
+You can use the hints below if you get stuck, but we encourage to first try solving the entire exercise before using hints.
+The hints often propose *one* way to solve the exercise, but in general, there is no right or wrong way to model a protocol!
+You can also talk to your peers, which is usually much more insightful than using hints!
 
 <details>
   <summary>How do I model key generation?</summary>
@@ -54,4 +56,46 @@ You can use the hints below if you get stuck.
 <details>
   <summary>How do I model that a participants memorizes their key?</summary>
   Use persistent facts (starting with a !).
+</details>
+
+## Step 2
+
+Now model all three protocol steps one-by-one.
+We suggest following the state-lookup/message-receive + state-write/message-send pattern.
+The skeleton file has been prepared to follow this pattern.
+For each rule's premise and conclusion, you will need to add more facts, though!
+
+Note that Tamarin supports some laws for `^`, in particular, `(a^b)^c = (a^c)^b`.
+
+Don't forget to regularly load your model, and check the executability lemma!
+
+Again, if you get stuck, you can use the hints below or talk to your peers.
+
+<details>
+  <summary>What is the state-lookup/message-receive + state-write/message-send pattern?</summary>
+  In this pattern, one models what are usually the arrows in a message sequence chart with one rule each.
+  Each of these rules is modelled as follows.
+  In the rule's premise, look up the participants state and receive a message.
+  In the conclusion of a rule, update the state (using a new fact!) and send a message.
+</details>
+
+<details>
+  <summary>How can participants verify a public key?</summary>
+  Earlier, you modelled the key generation.
+  Nothing prevents you from looking up someone else's key!
+  Then, you can use the Eq fact or pattern matching to check for equality between a key received and a key looked-up.
+</details>
+
+## Step 3
+
+Now you can prove properties of your model!
+Look at the lemmas that are commented out in the skeleton file.
+Do you expect them to hold for the protocol specification above?
+
+Comment them out and try proving them!
+Discuss your results with your peers.
+
+<details>
+  <summary>Expected results</summary>
+  All lemmas should be true.
 </details>
