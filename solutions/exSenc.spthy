@@ -1,0 +1,28 @@
+theory ExerciseSymmetricEncryption
+begin
+
+builtins: symmetric-encryption
+
+rule KeyGen:
+  [ Fr(~k) ]
+  -->
+  [ !Ltk($A, ~k) ]
+
+rule SendMsg:
+  [ !Ltk($A, ~k), Fr(~msg) ]
+  --[ Send($A, ~msg) ]->
+  [ Out(senc(~msg, ~k)) ]
+
+rule Leak:
+  [ !Ltk($A, ~k) ]
+  --[ Compromised($A) ]->
+  [ Out(~k) ]
+
+lemma Secrecy:
+  "All p m #t. Send(p, m) @ #t ==> not Ex #x. K(m) @ #x"
+
+lemma SecrecyWeakened:
+  "   All p m #t. Send(p, m) @ #t
+  ==> (not Ex #x. K(m) @ #x) | (Ex #x. Compromised(p) @ #x)"
+
+end
