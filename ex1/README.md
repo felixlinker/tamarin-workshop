@@ -1,68 +1,58 @@
-# Authenticated Diffie-Hellman Exercise
+# Symmetric Encryption Exercise
 
-In this exercise, you will model the following protocol, an authenticated Diffie-Hellman key exchange.
-In the following, `{m}s` denotes the symmetric encryption of message `m` with key `s`.
-
-```mermaid
-sequenceDiagram
-  Note over Alice: Sample skA
-  Note over Bob: Sample skB
-  Alice->>Bob: request, Alice, Bob, g^skA
-  Note over Bob: Verify g^skA
-  Note over Bob: Compute s := (g^skA)^skB
-  Bob->>Alice: {ack}s, Alice, Bob, g^skB
-  Note over Alice: Verify g^skB
-  Note over Alice: Compute s := (g^skB)^skA
-  Alice->>Bob: {m}s
-```
-
-The file `exADH.spthy` provides you with a skeleton model.
+In this exercise, you will familiarize yourself with the adversary in Tamarin.
+The file `exSenc.spthy` provides you with a skeleton model.
 As it stands, the model is in correct Tamarin syntax.
 We recommend that you regularly try to load your model to Tamarin to check your syntax.
 
-The model uses two built-in *message theories*.
-Message theories are sets of function and equations definitions for common use-cases.
-For this exercise, the following functions are important: `'g'^sk` (Diffie-Hellman exponentiation; it is a convention to use the constant `'g'` as base of the exponentiation), `senc(m, k)` (symmetric encryption of message `m` under key `k`), and `sdec(m, k)` (symmetric decryption of message `m` under key `k`).
+The model has four parts:
 
-We do not suggest following this link now, but you can find the documentation for the built-in message theories [here](https://tamarin-prover.github.io/manual/master/book/004_cryptographic-messages.html#sec:builtin-theories).
+- In line 4, we import the `symmetric-encryption` message theory.
+This theory defines the functions `senc/2` and `sdec/2`, with the equation `sdec(senc(m, k), k) = m`.
+- Lines 6-9 define a rule in which participant `$A` generates a fresh secret key `~k`.
+- Lines 11-15 provide a skeleton rule to send a message (we will look at this later).
+- Lines 17-18 defines a *secrecy* lemma.
+The lemma expresses:
 
-The model also comes with an *executability lemma*.
-Executability lemmas serve as sanity checks that your model works as you think it does.
-This executability lemma ensures that every message can be sent (all parts of your model are reachable).
-We recommend verifying the executability lemma whenever load your model after you made some changes.
-This catches modelling errors early and thus saves you pain!
+> Whenever participant `p` sends message `m`, there exists no point in time at which the adversary can learn `m`.
 
-Now to the exercise...
+`K(m)` is the fact that expresses that the adversary knows `m`.
 
 ## Step 1
 
-The protocol above assumes that Alice and Bob have access to authentic public keys.
-Start by implementing the rule `Ltk`, which should model a participant generating a fresh public-private key pair.
+Fill the rule `SendMsg` with life!
+At the end, participant `$A` should send message `~m` symmetrically encrypted under their previously generated key.
 
-If you get stuck, we encourage you to talk to your peers!
-But note that, in general, there is no right or wrong way to model a protocol.
+When you do so, uncomment the `Send` fact in the rule's label.
+Note that this means the variables `$A` and `~msg` must come from somewhere.
+
+Once you have implemented the rule, load the interactive mode of Tamarin and try verifying the `Secrecy` lemma.
+Does it hold?
+What would you expect?
 
 ## Step 2
 
-Now model all three protocol steps one-by-one.
-We suggest following the state-read/message-in + state-write/message-out pattern.
-The skeleton file has been prepared to follow this pattern.
-For each rule's premise and conclusion, you will need to add more facts, though!
+It is a common modelling patter in Tamarin to include a rule that leaks a participant's key.
+Usually, this is done to model more granular notions of compromise.
+Sometimes, certain security properties hold if only some types of keys are not leaked but others may leak.
 
-Note that Tamarin supports some laws for `^`, in particular, `(a^b)^c = (a^c)^b`.
+Model a new rule `Leak` that leaks a previously generated key to the adversary.
 
-Don't forget to regularly load your model, and check the executability lemma!
+If you have done so, verify the `Secrecy` lemma again.
+Given that the participants key leaked, the adversary should now be able to learn the previously sent message.
+
+Tamarin gives you a graphical output when it finds an attack.
+Try relating this output to you model.
+Can you make sense of it?
 
 ## Step 3
 
-Now you can prove properties of your model!
-Look at the lemmas that are commented out in the skeleton file.
-Do you expect them to hold for the protocol specification above?
+To "document" which key leakage is permitted, Tamarin modelers often use a `Compromised(p)` fact in formulas to document which participant's keys leaked.
 
-Comment them out and try proving them!
-Discuss your results with your peers.
+Add such a fact to one of the three rules of the model.
+Then, write a new `SecrecyWeakened` expressing:
 
-<details>
-  <summary>Expected results</summary>
-  All lemmas should verify successfully.
-</details>
+> Whenever participant `p` sends message `m`, there exists no point in time at which the adversary can learn `m` or there exists a point in time at which `p`'s key leaked.
+
+Try verifying this lemma.
+Which result would you expect?
