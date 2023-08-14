@@ -4,7 +4,15 @@ This repository provides files for a 2h Tamarin workshop.
 
 ## Installation
 
-Please follow [these installation instructions](https://tamarin-prover.github.io/manual/master/book/002_installation.html).
+Here's a tl;dr version of the [full installation instructions](https://tamarin-prover.github.io/manual/master/book/002_installation.html):
+
+1. Install [brew](https://brew.sh/).
+2. Run `brew install tamarin-prover/tap/tamarin-prover
+`.
+
+For Windows, use [WSL](https://learn.microsoft.com/windows/wsl/install).
+
+If you want to use syntax highlighting, we suggest using [Visual Studio Code](https://code.visualstudio.com/) with [this extension](https://marketplace.visualstudio.com/items?itemName=gilcu3.tamarin) (search for extension with ID `gilcu3.tamarin`).
 
 ## Launching Tamarin
 

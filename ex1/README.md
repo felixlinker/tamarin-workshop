@@ -1,4 +1,4 @@
-# Exercise 1
+# Authenticated Diffie-Hellman Exercise
 
 In this exercise, you will model the following protocol, an authenticated Diffie-Hellman key exchange.
 In the following, `{m}s` denotes the symmetric encryption of message `m` with key `s`.
@@ -16,15 +16,15 @@ sequenceDiagram
   Alice->>Bob: {m}s
 ```
 
-The file `exADH.spthy` provides you with a skeleton file.
-As it stands, the file is in correct Tamarin syntax.
-We recommend that you regular try to load your model to Tamarin to check your syntax.
+The file `exADH.spthy` provides you with a skeleton model.
+As it stands, the model is in correct Tamarin syntax.
+We recommend that you regularly try to load your model to Tamarin to check your syntax.
 
 The model uses two built-in *message theories*.
 Message theories are sets of function and equations definitions for common use-cases.
 For this exercise, the following functions are important: `'g'^sk` (Diffie-Hellman exponentiation; it is a convention to use the constant `'g'` as base of the exponentiation), `senc(m, k)` (symmetric encryption of message `m` under key `k`), and `sdec(m, k)` (symmetric decryption of message `m` under key `k`).
 
-We do not suggest to follow this link now, but you can find the documentation for the built-in message theories [here](https://tamarin-prover.github.io/manual/master/book/004_cryptographic-messages.html#sec:builtin-theories).
+We do not suggest following this link now, but you can find the documentation for the built-in message theories [here](https://tamarin-prover.github.io/manual/master/book/004_cryptographic-messages.html#sec:builtin-theories).
 
 The model also comes with an *executability lemma*.
 Executability lemmas serve as sanity checks that your model works as you think it does.
@@ -39,52 +39,19 @@ Now to the exercise...
 The protocol above assumes that Alice and Bob have access to authentic public keys.
 Start by implementing the rule `Ltk`, which should model a participant generating a fresh public-private key pair.
 
-You can use the hints below if you get stuck, but we encourage to first try solving the entire exercise before using hints.
-The hints often propose *one* way to solve the exercise, but in general, there is no right or wrong way to model a protocol!
-You can also talk to your peers, which is usually much more insightful than using hints!
-
-<details>
-  <summary>How do I model key generation?</summary>
-  Use the Fr fact to model the generation of a fresh, unguessable value.
-</details>
-
-<details>
-  <summary>How do I identify participants?</summary>
-  It is a common convention among modellers to use public values (starting with a dollar) to model identifiers for participants.
-</details>
-
-<details>
-  <summary>How do I model that a participants memorizes their key?</summary>
-  Use persistent facts (starting with a !).
-</details>
+If you get stuck, we encourage you to talk to your peers!
+But note that, in general, there is no right or wrong way to model a protocol.
 
 ## Step 2
 
 Now model all three protocol steps one-by-one.
-We suggest following the state-lookup/message-receive + state-write/message-send pattern.
+We suggest following the state-read/message-in + state-write/message-out pattern.
 The skeleton file has been prepared to follow this pattern.
 For each rule's premise and conclusion, you will need to add more facts, though!
 
 Note that Tamarin supports some laws for `^`, in particular, `(a^b)^c = (a^c)^b`.
 
 Don't forget to regularly load your model, and check the executability lemma!
-
-Again, if you get stuck, you can use the hints below or talk to your peers.
-
-<details>
-  <summary>What is the state-lookup/message-receive + state-write/message-send pattern?</summary>
-  In this pattern, one models what are usually the arrows in a message sequence chart with one rule each.
-  Each of these rules is modelled as follows.
-  In the rule's premise, look up the participants state and receive a message.
-  In the conclusion of a rule, update the state (using a new fact!) and send a message.
-</details>
-
-<details>
-  <summary>How can participants verify a public key?</summary>
-  Earlier, you modelled the key generation.
-  Nothing prevents you from looking up someone else's key!
-  Then, you can use the Eq fact or pattern matching to check for equality between a key received and a key looked-up.
-</details>
 
 ## Step 3
 
@@ -97,5 +64,5 @@ Discuss your results with your peers.
 
 <details>
   <summary>Expected results</summary>
-  All lemmas should be true.
+  All lemmas should verify successfully.
 </details>

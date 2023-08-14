@@ -7,9 +7,9 @@ Complete reference: [link](https://tamarin-prover.github.io/manual/master/book/0
 ```tamarin
 rule RuleName:
   let t3 = t2 in  // optional
-  [ F1(t1, t2) ]  // premise
+  [ F1(t1, t2) ]  // premise (multiset/list of facts)
   --[ L(t1) ]->
-  [ F2(t3) ]      // conclusion
+  [ F2(t3) ]      // conclusion (multiset/list of facts)
 ```
 
 - `F1`, `F2` are *facts*
