@@ -39,7 +39,7 @@ rule A_SendMsg:
   ]
 
 // This restriction allows you to use the Eq action fact in rules to constrain
-// that two terms must be equal. This is used two "compare" two messages or
+// that two terms must be equal. This is used to "compare" two messages or
 // terms, e.g., to check that signature verification is equal to true.
 // This rule is only commented out right now to suppress a warning that Eq is
 // referenced but not used. Un-comment it whenever you want!
