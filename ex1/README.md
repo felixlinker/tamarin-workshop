@@ -32,7 +32,7 @@ What would you expect?
 
 ## Step 2
 
-It is a common modelling patter in Tamarin to include a rule that leaks a participant's key.
+It is a common modelling pattern in Tamarin to include a rule that leaks a participant's key.
 Usually, this is done to model more granular notions of compromise.
 Sometimes, certain security properties hold if only some types of keys are not leaked but others may leak.
 
