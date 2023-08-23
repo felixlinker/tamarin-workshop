@@ -10,6 +10,9 @@ The model has four parts:
 - In line 4, we import the `symmetric-encryption` message theory.
 This theory defines the functions `senc/2` and `sdec/2`, with the equation `sdec(senc(m, k), k) = m`.
 - Lines 6-9 define a rule in which participant `$A` generates a fresh secret key `~k`.
+We memorize that the key is associated with the participant using the *fact* `!LongTermKey`.
+The `!` means that this fact can be used for lookup multiple times.
+Facts that do not start with a `!` can be used only once.
 - Lines 11-15 provide a skeleton rule to send a message (we will look at this later).
 - Lines 17-18 defines a *secrecy* lemma.
 The lemma expresses:
@@ -17,6 +20,8 @@ The lemma expresses:
 > Whenever participant `p` sends message `m`, there exists no point in time at which the adversary can learn `m`.
 
 `K(m)` is the fact that expresses that the adversary knows `m`.
+
+In the top-level folder of this repository, you will also find a `cheatsheet.md` file that serves as a quick reference for the Tamarin syntax.
 
 ## Step 1
 
@@ -47,7 +52,7 @@ Can you make sense of it?
 
 ## Step 3
 
-To "document" which key leakage is permitted, Tamarin modelers often use a `Compromised(p)` fact in formulas to document which participant's keys leaked.
+To "document" which key leakage is permitted, Tamarin modelers often use a `ParticipantWasCompromised(p)` fact in formulas to document which participant's keys leaked.
 
 Add such a fact to one of the three rules of the model.
 Then, write a new `SecrecyWeakened` expressing:

@@ -25,14 +25,14 @@ rule A_SendMsg:
   let sharedKey = pkB^~sk in
   [ !Ltk($A, ~sk), !Pk($B, pkB), Fr(~msg)
   , In(<encryptedAck, $A, $B, pkB>), St_A($A, $B) ]
-  --[ SecretSendMsg(~msg)
+  --[ MessageWasSent(~msg)
     , InitiatorKey(sharedKey)
     , Eq('ack', sdec(encryptedAck, sharedKey)) ]->
   [ Out(senc(~msg, sharedKey)) ]
 
 lemma Executability:
   exists-trace
-  "Ex m #t. SecretSendMsg(m) @ #t"
+  "Ex m #t. MessageWasSent(m) @ #t"
 
 lemma ResponderKey:
   "All k #t. ResponderKey(k) @ #t ==> not Ex #x. K(k) @ #x"
@@ -41,7 +41,7 @@ lemma InitiatorKey:
   "All k #t. InitiatorKey(k) @ #t ==> not Ex #x. K(k) @ #x"
 
 lemma SecrecyMessage:
-  "All m #t. SecretSendMsg(m) @ #t ==> not Ex #x. K(m) @ #x"
+  "All m #t. MessageWasSent(m) @ #t ==> not Ex #x. K(m) @ #x"
 
 restriction Eq:
   "All t1 t2 #x. Eq(t1, t2) @ #x ==> t1 = t2"

@@ -32,7 +32,7 @@ rule A_SendMsg:
   // , St_A(...)
   ]
   --[ ReachASendMsg()
-    // SendMsg(_)
+    // MessageWasSent(_)
     // , InitiatorKey(_)
     ]->
   [ // Out(...)
@@ -59,6 +59,6 @@ lemma Executability:
 //   "All k #t. InitiatorKey(k) @ #t ==> not Ex #x. K(k) @ #x"
 
 // lemma SendMsgSecrecy:
-//   "All m #t. SendMsg(m) @ #t ==> not Ex #x. K(m) @ #x"
+//   "All m #t. MessageWasSent(m) @ #t ==> not Ex #x. K(m) @ #x"
 
 end

@@ -6,15 +6,15 @@ builtins: symmetric-encryption
 rule KeyGen:
   [ Fr(~k) ]
   -->
-  [ !Ltk($A, ~k) ]
+  [ !LongTermKey($A, ~k) ]
 
 rule SendMsg:
   []
-  --[ // Send($A, ~msg)
+  --[ // MessageWasSentBy($A, ~msg)
     ]->
   []
 
 lemma Secrecy:
-  "All p m #t. Send(p, m) @ #t ==> not Ex #x. K(m) @ #x"
+  "All p m #t. MessageWasSentBy(p, m) @ #t ==> not Ex #x. K(m) @ #x"
 
 end

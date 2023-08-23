@@ -6,23 +6,23 @@ builtins: symmetric-encryption
 rule KeyGen:
   [ Fr(~k) ]
   -->
-  [ !Ltk($A, ~k) ]
+  [ !LongTermKey($A, ~k) ]
 
 rule SendMsg:
-  [ !Ltk($A, ~k), Fr(~msg) ]
-  --[ Send($A, ~msg) ]->
+  [ !LongTermKey($A, ~k), Fr(~msg) ]
+  --[ MessageWasSentBy($A, ~msg) ]->
   [ Out(senc(~msg, ~k)) ]
 
 rule Leak:
-  [ !Ltk($A, ~k) ]
-  --[ Compromised($A) ]->
+  [ !LongTermKey($A, ~k) ]
+  --[ ParticipantWasCompromised($A) ]->
   [ Out(~k) ]
 
 lemma Secrecy:
-  "All p m #t. Send(p, m) @ #t ==> not Ex #x. K(m) @ #x"
+  "All p m #t. MessageWasSentBy(p, m) @ #t ==> not Ex #x. K(m) @ #x"
 
 lemma SecrecyWeakened:
-  "   All p m #t. Send(p, m) @ #t
-  ==> (not Ex #x. K(m) @ #x) | (Ex #x. Compromised(p) @ #x)"
+  "   All p m #t. MessageWasSentBy(p, m) @ #t
+  ==> (not Ex #x. K(m) @ #x) | (Ex #x. ParticipantWasCompromised(p) @ #x)"
 
 end
