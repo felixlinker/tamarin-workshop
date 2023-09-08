@@ -10,6 +10,9 @@ For Windows, use [WSL](https://learn.microsoft.com/windows/wsl/install).
 
 If you want to use syntax highlighting, we suggest using [Visual Studio Code](https://code.visualstudio.com/) with [this extension](https://marketplace.visualstudio.com/items?itemName=gilcu3.tamarin) (search for extension with ID `gilcu3.tamarin`).
 
+There is also syntax highlighting for [Sublime Text 3](https://github.com/tamarin-prover/editor-sublime) available.
+You can install syntax highlighting using "Package Control."
+
 ### Manually
 
 1. Install graphviz: `sudo apt install graphviz`
@@ -18,9 +21,13 @@ If you want to use syntax highlighting, we suggest using [Visual Studio Code](ht
 
 ### Using Brew
 
+This method works on all platforms (provided you use WSL on Windows).
+
 1. Install [brew](https://brew.sh/).
 2. Run `brew install tamarin-prover/tap/tamarin-prover
 `.
+
+If brew exits with the error "Too many open files," rerunning the command usually fixes it.
 
 ## Launching Tamarin
 
