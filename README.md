@@ -4,15 +4,23 @@ This repository provides files for a 2h Tamarin workshop.
 
 ## Installation
 
-Here's a tl;dr version of the [full installation instructions](https://tamarin-prover.github.io/manual/master/book/002_installation.html):
-
-1. Install [brew](https://brew.sh/).
-2. Run `brew install tamarin-prover/tap/tamarin-prover
-`.
+Here's a tl;dr version of the [full installation instructions](https://tamarin-prover.github.io/manual/master/book/002_installation.html).
 
 For Windows, use [WSL](https://learn.microsoft.com/windows/wsl/install).
 
 If you want to use syntax highlighting, we suggest using [Visual Studio Code](https://code.visualstudio.com/) with [this extension](https://marketplace.visualstudio.com/items?itemName=gilcu3.tamarin) (search for extension with ID `gilcu3.tamarin`).
+
+### Manually
+
+1. Install graphviz: `sudo apt install graphviz`
+2. Install [Maude](https://github.com/SRI-CSL/Maude/releases/tag/Maude3.3.1) (click link, download, unzip, and put on path). Note: rename `maude.linux` to `maude`.
+3. Install [Tamarin](https://github.com/tamarin-prover/tamarin-prover/releases/tag/1.8.0) (click link, download `tamarin-prover-1.8.0-linux64-ubuntu.tar.gz`, unzip, and put on path).
+
+### Using Brew
+
+1. Install [brew](https://brew.sh/).
+2. Run `brew install tamarin-prover/tap/tamarin-prover
+`.
 
 ## Launching Tamarin
 
