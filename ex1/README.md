@@ -28,7 +28,7 @@ In the top-level folder of this repository, you will also find a `cheatsheet.md`
 Fill the rule `SendMsg` with life!
 At the end, participant `$A` should send message `~m` symmetrically encrypted under their previously generated key.
 
-When you do so, uncomment the `Send` fact in the rule's label.
+When you do so, uncomment the `MessageWasSent` fact in the rule's label.
 Note that this means the variables `$A` and `~msg` must come from somewhere.
 
 Once you have implemented the rule, load the interactive mode of Tamarin and try verifying the `Secrecy` lemma.
