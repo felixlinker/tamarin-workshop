@@ -49,6 +49,9 @@ We suggest following the state-read/message-in + state-write/message-out pattern
 The skeleton file has been prepared to follow this pattern.
 For each rule's premise and conclusion, you will need to add more facts, though!
 
+You can send multiple values at the same time using tuples (e.g., `<'a', 'b', 'c'>` is a tuple of three constants).
+You can think of tuples as lists.
+
 Note that Tamarin supports some laws for `^`, in particular, `(a^b)^c = (a^c)^b`.
 
 Don't forget to regularly load your model, and check the executability lemma!
