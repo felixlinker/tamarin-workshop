@@ -24,8 +24,7 @@ You can install syntax highlighting using "Package Control."
 This method works on all platforms (provided you use WSL on Windows).
 
 1. Install [brew](https://brew.sh/).
-2. Run `brew install tamarin-prover/tap/tamarin-prover
-`.
+2. Run `brew install tamarin-prover/tap/tamarin-prover`.
 
 If brew exits with the error "Too many open files," rerunning the command usually fixes it.
 
