@@ -7,7 +7,7 @@ In the following, `{m}s` denotes the symmetric encryption of message `m` with ke
 sequenceDiagram
   Note over Alice: Sample skA
   Note over Bob: Sample skB
-  Alice->>Bob: request, Alice, Bob, g^skA
+  Alice->>Bob: Alice, Bob, g^skA
   Note over Bob: Verify g^skA
   Note over Bob: Compute s := (g^skA)^skB
   Bob->>Alice: {ack}s, Alice, Bob, g^skB
