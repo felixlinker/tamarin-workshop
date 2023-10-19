@@ -3,6 +3,11 @@
 In this exercise, you will model the following protocol, an authenticated Diffie-Hellman key exchange.
 In the following, `{m}s` denotes the symmetric encryption of message `m` with key `s`.
 
+<!--
+  NOTE: Below is a message sequence diagram of the protocol flow.
+  To see it rendered, you can open this file in the github repository, or use a
+  markdown previewer that supports mermaid.
+-->
 ```mermaid
 sequenceDiagram
   Note over Alice: Sample skA
