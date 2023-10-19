@@ -1,6 +1,24 @@
 # Tamarin Workshop
 
-This repository provides files for a 2h Tamarin workshop.
+This repository provides files for a 2-4h Tamarin workshop.
+Note that all exercises are self-contained and can be solved for individual training as well.
+Make sure that you use the cheat sheet (`chetsheet.md`) included in this repository and the [official documentation](https://tamarin-prover.github.io/manual/master/book/001_introduction.html).
+
+The workshop structure is planned as follows:
+
+- 20 minute presentation: Introduction to Tamarin and live demo of minimal example (`solutions/TCP.spthy`).
+- 100 minutes: Working on exercises 1+2.
+- 15 minute presentation: How does Tamarin work? How could one proof lemmas manually?
+- Rest of the time: Working on exercises.
+
+## Workshop Preparation
+
+If you plan to attend this workshop in person, we suggest that you:
+
+1. Either clone or download this repository. The folders `ex1/` and `ex2/` contain skeleton files that you should modify.
+2. Install Tamarin (see [Installation](#installation)).
+
+Depending on your editor, you might prefer the preview for the exercise instructions here on GitHub to get proper markdown rendering.
 
 ## Installation
 
