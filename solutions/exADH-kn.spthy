@@ -1,0 +1,181 @@
+// Solution proposal for Ex2 in IRFT UFMRG workshop on Tamarin
+// https://github.com/felixlinker/tamarin-workshop/tree/main
+// Prove with tamarin-prover --prove exADH-kn.spthy
+// Karl Norrman, Ericsson Research and KTH Royal Institute of Technology, 2023-10-25
+theory ExerciseADH
+begin
+
+builtins: symmetric-encryption, diffie-hellman
+
+// Assume:
+//  - Unique keys and unique names => adv cannot register arbitrary keys/names
+//  - Unique pairs of (key, id) => adv cannot register arbitrary bindings (key, name)
+//  - Ids and keys are different name spaces
+rule Ltk:
+  let
+    sk = ~x            // Secret key shorthand
+    pk = 'g'^~x        // Public key shorthand
+  in
+  [ Fr(sk), Fr(~id)]   // Create fresh secret key and id => uniqueness
+  --[
+    // Prefixing action facts with A to get different "namespace" compared
+    // to regular facts.  Dicipline to prevent accidental use of non-action
+    // facts in lemmas.
+    APk(~id, pk)       // Action fact for trace
+  , ASk(~id, sk)       // Action fact for trace
+  ]->
+  [ Out(<~id, pk>)     // Public keys are public => give pk to adv
+  , !Pk(~id, pk)       // Store pk indefinitely and securely from adv
+  , !Sk(~id, sk)       // Store sk indefinitely and securely from adv
+  ]
+
+
+rule A_Init:
+  let
+    m1 = <idA, idB, pkA>  // KE message m1
+  in
+  [ !Pk(idA, pkA)       // Obtain own ID, anyone will do
+  , !Pk(idB, pkB)       // Obtain a peer ID, anyone will do
+  ]
+  --[ AReachAInit() ]-> 
+  [ Out(m1)             // Send m1 via adv
+  , St_A(idA, idB)      // Keep state for "next invocation"
+  ]
+
+rule B_Init:
+  let 
+    s = pkA^~skB                         // established shared secret
+    m1 = <idA, idB, pkA>                 // KE message m1
+    m2 = <senc('ack', s), idA, idB, pkB> // KE message m2
+  in
+  [ In(m1)              // Read m1 from "interface", i.e., from adv
+  , !Sk(idB, ~skB)      // Look up own sk
+  , !Pk(idB, pkB)       // Look up own pk
+  , !Pk(idA, pkA)       // Look up peer id-to-pk binding, vfy pkA by matching and
+                        //   uniquness assumptions on PKI (see Ltk rule)
+  ]
+  --[ AReachBInit()
+    , AResponderKey(s)  // Write established key to trace
+    , AResponderKey2(idA, idB, s) // Write established key to trace for lemma on eq keys
+    ]->
+  [ Out(m2)
+  ]
+
+rule A_SendMsg:
+  let
+    s = pkB^~skA        // Established shared secret, DH thy takes care of term-eq
+    m2 = <senc('ack', s), idA, idB, pkB> // KE message m2, implicit vfy of s by
+                                         //   matching on senc of s because
+                                         //   senc term can't be constructed without
+                                         //   knowing s
+    m3 = senc(~m, s)
+  in
+  [ In(m2)
+  , St_A(idA, idB)
+  , Fr(~m)
+  , !Sk(idA, ~skA)    // Look up own sk
+  , !Pk(idB, pkB)     // Look up peer id-to-pk binding
+  ]
+  --[ AReachASendMsg()
+    , AMessageWasSent(~m)
+    , AInitiatorKey(s) // Write established key to trace
+    , AInitiatorKey2(idA, idB, s) // Write established key to trace for lemma on eq keys
+    ]->
+  [ Out(m3)
+  ]
+
+// This restriction allows you to use the Eq action fact in rules to constrain
+// that two terms must be equal. This is used to "compare" two messages or
+// terms, e.g., to check that signature verification is equal to true.
+// This rule is only commented out right now to suppress a warning that Eq is
+// referenced but not used. Un-comment it whenever you want!
+// restriction Eq:
+//   "All t1 t2 #x. Eq(t1, t2) @ #x ==> t1 = t2"
+
+// The default smart (s) heuristic runs out of memory
+heuristic: c
+
+lemma Executability:
+  exists-trace
+  "Ex #t1 #t2 #t3. AReachAInit() @ #t1 & AReachBInit() @ #t2 & AReachASendMsg() @ #t3"
+
+lemma ExecutabilityEqS:
+  exists-trace
+  "Ex s #t1 #t2. AInitiatorKey(s) @ #t1 & AResponderKey(s) @ #t2"
+
+lemma ExecutabilityAdvActiveB:
+  exists-trace // ... where adv attacks B on m1 without A
+  "Ex #t1. AReachBInit()@#t1 & not(Ex #t2. AReachAInit()@#t2)"
+
+// Rule A_SendMsg cannot be triggered in the same way because
+// if protocol is secure, then the "senc('ack', s) term in message m1 won't match.
+// Hence the following lemma does not guarantee that adv did indeed try injecting
+// a false message m2.  It does not distinguish attempted from thwarted atempts.
+lemma ExecutabilityAdvActiveA_SHOULD_BE_FALSIFIED:
+  exists-trace // ... where adv attacks A on m2 without B
+  "Ex #t1. AReachASendMsg()@#t1 & not(Ex #t2. AReachBInit()@#t2)"
+
+// K(m) @ #t means that the adversary knows message m at timepoint #t.
+// Again, the following lemmas are commented out to suppress warnings.
+lemma ResponderKeySecrecy:
+   "All k #t. AResponderKey(k) @ #t ==> not Ex #x. K(k) @ #x"
+
+lemma InitiatorKeySecrecy:
+   "All k #t. AInitiatorKey(k) @ #t ==> not Ex #x. K(k) @ #x"
+
+lemma SendMsgSecrecy:
+   "All m #t. AMessageWasSent(m) @ #t ==> not Ex #x. K(m) @ #x"
+
+lemma AgreementOnKey:
+   "All k #t1. AInitiatorKey(k)@#t1 ==> Ex #t2. AResponderKey(k)@#t2"
+
+// Other direction does not hold because adv may simply drop m2
+// If there was a rule where B accepted/verified m3 we could
+// show agreement in that direction too.
+lemma AgreementOnKey2_SHOULD_BE_FALSIFIED:
+   "All k #t1. AResponderKey(k)@#t1 ==> Ex #t2. AInitiatorKey(k)@#t2"
+
+lemma KeysAreNotFreshPerRun:
+   all-traces // ... result in the same key when parties are the same
+   "All idA idB k1 k2 #t1 #t2 #t3 #t4.
+        ( AInitiatorKey2(idA, idB, k1)@#t1
+        & AResponderKey2(idA, idB, k1)@#t2
+        & AInitiatorKey2(idA, idB, k2)@#t3
+        & AResponderKey2(idA, idB, k2)@#t4
+        ) ==> k1 = k2
+   "
+
+lemma ThereIsMoreThanOneRunPerParty:
+   exists-trace // ... with more than one run between two parties
+   "Ex idA idB k1 k2 k3 k4 #t1 #t2 #t3 #t4.
+          AInitiatorKey2(idA, idB, k1)@#t1
+        & AResponderKey2(idA, idB, k2)@#t2
+        & AInitiatorKey2(idA, idB, k3)@#t3
+        & AResponderKey2(idA, idB, k4)@#t4
+        & (not(#t1 = #t3) | not(#t2 = #t4))
+   "
+
+lemma PKICorrectness:
+        exists-trace // ... with at least two parties, (but model accepts single-party runs)
+        "Ex idA skA pkA idB skB pkB #t1 #t2.
+                  ASk(idA, skA)@#t1 
+                & APk(idA, pkA)@#t1 
+                & ASk(idB, skB)@#t2 
+                & APk(idB, pkB)@#t2 
+                & not(idA = idB)
+                & not(skA = skB)
+                & not(pkA = pkB)
+        "
+
+lemma PKIValidation:
+        all-traces // ... have unique registrations in PKI
+        "All idA skA pkA idB skB pkB #t1 #t2 #t3 #t4.
+                ( (   ASk(idA, skA)@#t1 
+                    & ASk(idB, skB)@#t2 
+                    & APk(idA, pkA)@#t3 
+                    & APk(idB, pkB)@#t4 
+                    & not(#t1 = #t2)
+                  ) ==> ((not(idA = idB)) & not(skA = skB) & not(pkA = pkB))
+                )
+        "
+end
