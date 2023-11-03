@@ -59,11 +59,11 @@ Before initiating the protocol, the client registers with the authorization serv
 The means through which the client registers with the authorization server are beyond the scope of this specification but typically involve end-user interaction with an HTML registration form.
 
 Client registration does not require a direct interaction between the client and the authorization server.
-When supported by the authorization server, registration can rely on other means for establishing trust and obtaining the required client properties (e.g., redirection URI, client type).
+When supported by the authorization server, registration can rely on other means for establishing trust and obtaining the required client properties.
 For example, registration can be accomplished using a self-issued or third-party-issued assertion,
 or by the authorization server performing client discovery using a trusted channel.
 
-When registering a client, the client developer SHALL provide its client redirection URIs as described in Section [Redirection Endpoint](#redirection-endpoint).
+When registering a client, the client developer MUST provide its client redirection URIs as described in Section [Redirection Endpoint](#redirection-endpoint).
 
 ### Client Types
 
@@ -111,16 +111,10 @@ The authorization server redirects the user-agent to the client's redirection en
 
 ##### Registration Requirements
 
-The authorization server SHOULD require all clients to register their redirection endpoint prior to utilizing the authorization endpoint.
-The authorization server SHOULD require the client to provide the complete redirection URI (the client MAY use the "state" request parameter to achieve per-request customization).
-
+The authorization server MUST require all clients to register their redirection endpoint prior to utilizing the authorization endpoint.
 The authorization server MAY allow the client to register multiple redirection endpoints.
 
-##### Dynamic Configuration
-
-If multiple redirection URIs have been registered, or if no redirection URI has been registered, the client MUST include a redirection URI with the authorization request using the "redirect_uri" request parameter.
-
-When a redirection URI is included in an authorization request, the authorization server MUST compare and match the value received against at least one of the registered redirection URIs, if any redirection URIs were registered.
+For every redirection URI included in an authorization request, the authorization server MUST compare and match the value received against at least one of the registered redirection URIs.
 The authorization server MUST compare URIs using simple string comparison.
 
 ### Token Endpoint
@@ -152,8 +146,7 @@ The authorization is expressed in the form of an authorization code, which the c
 ### Authorization Code Grant
 
 The authorization code grant type is used to obtain access tokens.
-Since this is a redirection-based flow, the client must be capable of interacting with the end-user's user-agent (typically a web browser) and capable of receiving incoming requests (via redirection)
-from the authorization server.
+Since this is a redirection-based flow, the client must be capable of interacting with the end-user's user-agent (typically a web browser) and capable of receiving incoming requests (via redirection) from the authorization server.
 
 ```
 +----------+
@@ -203,7 +196,7 @@ If valid, the authorization server responds back with an access token.
 The client constructs the request URI by adding the following parameters to the query component of the authorization endpoint URI using the "application/x-www-form-urlencoded" format:
 
 * **client_id** REQUIRED. The client identifier as described in Section [Client Identifier](#client-identifier).
-* **redirect_uri** OPTIONAL. As described in Section [Redirection Endpoint](#redirection-endpoint).
+* **redirect_uri** REQUIRED. As described in Section [Redirection Endpoint](#redirection-endpoint).
 * **scope** OPTIONAL. The scope of the access request as described by Section [Access Token Scope](#access-token-scope).
 * **state** RECOMMENDED. An opaque value used by the client to maintain state between the request and callback.
 The authorization server includes this value when redirecting the user-agent back to the client.
@@ -250,7 +243,6 @@ The client makes a request to the token endpoint by sending the following parame
 format with a character encoding of UTF-8 in the HTTP request entity-body:
 
 * **code** REQUIRED. The authorization code received from the authorization server.
-* **redirect_uri** REQUIRED, if the "redirect_uri" parameter was included in the authorization request as described in Section [Authorization Request](#authorization-request), and their values MUST be identical.
 * **client_id** REQUIRED.
 
 The client MUST authenticate with the authorization server as described in Section [Client Authentication](#client-authentication).
@@ -264,7 +256,6 @@ Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
 Content-Type: application/x-www-form-urlencoded
 
 grant_type=authorization_code&code=SplxlOBeZQQYbYS6WxSbIA
-&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb
 ```
 
 The authorization server MUST:
@@ -272,7 +263,6 @@ The authorization server MUST:
 * authenticate the client,
 * ensure that the authorization code was issued to the authenticated client,
 * verify that the authorization code is valid, and
-* ensure that the "redirect_uri" parameter is present if the "redirect_uri" parameter was included in the initial authorization request as described in Section [Authorization Request](#authorization-request), and if included ensure that their values are identical.
 
 #### Access Token Response
 
