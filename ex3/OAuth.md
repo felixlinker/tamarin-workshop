@@ -32,11 +32,8 @@ A single authorization server may issue access tokens accepted by multiple resou
 ### Authorization Code
 
 An authorization code is a credential representing the end-user's authorization (to access its protected resources) used by the client to obtain an access token.
-The authorization code is obtained by using an authorization server.
-After having obtained an authorization code, the client directs the end-user to an authorization server (via its user-agent), which in turn directs the end-user back to the client with the authorization code.
-
+The authorization code is obtained by using an authorization server by the client directing the end-user to an authorization server (via its user-agent), which in turn directs the end-user back to the client with the authorization code.
 Before directing the end-user back to the client with the authorization code, the authorization server authenticates the end-user and obtains authorization.
-Because the end-user only authenticates with the authorization server, the end-user's credentials are never shared with the client.
 
 ### Access Token
 
@@ -65,17 +62,13 @@ When registering a client, the client developer SHALL provide its client redirec
 
 ### Client Types
 
-OAuth assumes clients capable of maintaining the confidentiality of shared secrets.
+This specification assumes clients capable of maintaining the confidentiality of shared secrets.
 
 ### Client Identifier
 
 The authorization server issues the registered client a client identifier -- a unique string representing the registration information provided by the client.
 The client identifier is not a secret; it is exposed to the end-user and MUST NOT be used alone for client authentication.
 The client identifier is unique to the authorization server.
-
-The client identifier string size is left undefined by this specification.
-The client should avoid making assumptions about the identifier size.
-The authorization server SHOULD document the size of any identifier it issues.
 
 ### Client Authentication
 
@@ -89,8 +82,6 @@ parameters:
 * **client_secret** REQUIRED. The client secret.
 
 The parameters can only be transmitted in the request-body and MUST NOT be included in the request URI.
-
-Since client authentication method involves a password, the authorization server MUST protect any endpoint utilizing it against brute force attacks.
 
 ## Protocol Endpoints
 
@@ -108,13 +99,6 @@ As well as one client endpoint:
 The authorization endpoint is used to interact with the end-user and obtain an authorization grant.
 The authorization server MUST first verify the identity of the end-user by verifying the client secret established in [Client Authentication](#client-authentication).
 
-#### Response Type
-
-The authorization endpoint is used by the authorization code grant type and implicit grant type flows.
-The client informs the authorization server of the desired grant type using the following parameter:
-
-* **response_type** REQUIRED. The value MUST be "code" for requesting an authorization code as described by Section 4.1.1, [...].
-
 #### Redirection Endpoint
 
 After completing its interaction with the end-user, the authorization server directs the end-user's user-agent back to the client.
@@ -123,22 +107,16 @@ The authorization server redirects the user-agent to the client's redirection en
 ##### Registration Requirements
 
 The authorization server SHOULD require all clients to register their redirection endpoint prior to utilizing the authorization endpoint.
-
 The authorization server SHOULD require the client to provide the complete redirection URI (the client MAY use the "state" request parameter to achieve per-request customization).
-If requiring the registration of the complete redirection URI is not possible, the authorization server SHOULD require the registration of the URI scheme, authority, and path (allowing the client to dynamically vary only the query component of the redirection URI when requesting authorization).
 
 The authorization server MAY allow the client to register multiple redirection endpoints.
 
 ##### Dynamic Configuration
 
-If multiple redirection URIs have been registered, if only part of the redirection URI has been registered, or if no redirection URI has been registered, the client MUST include a redirection URI with the authorization request using the "redirect_uri" request parameter.
+If multiple redirection URIs have been registered, or if no redirection URI has been registered, the client MUST include a redirection URI with the authorization request using the "redirect_uri" request parameter.
 
-When a redirection URI is included in an authorization request, the authorization server MUST compare and match the value received against at least one of the registered redirection URIs (or URI components), if any redirection URIs were registered.
-If the client registration included the full redirection URI, the authorization server MUST compare the two URIs using simple string comparison.
-
-##### Invalid Endpoint
-
-If an authorization request fails validation due to a missing, invalid, or mismatching redirection URI, the authorization server SHOULD inform the end-user of the error and MUST NOT automatically redirect the user-agent to the invalid redirection URI.
+When a redirection URI is included in an authorization request, the authorization server MUST compare and match the value received against at least one of the registered redirection URIs, if any redirection URIs were registered.
+The authorization server MUST compare URIs using simple string comparison.
 
 ### Token Endpoint
 
@@ -217,7 +195,7 @@ If valid, the authorization server responds back with an access token.
 
 #### Authorization Request
 
-The client constructs the request URI by adding the following parameters to the query component of the authorization endpoint URI using the "application/x-www-form-urlencoded" format, per Appendix B:
+The client constructs the request URI by adding the following parameters to the query component of the authorization endpoint URI using the "application/x-www-form-urlencoded" format:
 
 * **client_id** REQUIRED. The client identifier as described in Section [Client Identifier](#client-identifier).
 * **redirect_uri** OPTIONAL. As described in Section [Redirection Endpoint](#redirection-endpoint).
@@ -246,8 +224,7 @@ When a decision is established, the authorization server directs the user-agent 
 If the end-user grants the access request, the authorization server issues an authorization code and delivers it to the client by adding the following parameters to the query component of the redirection URI using the "application/x-www-form-urlencoded" format:
 
 * **code** REQUIRED. The authorization code generated by the authorization server.
-The authorization code MUST expire shortly after it is issued to mitigate the risk of leaks.
-A maximum authorization code lifetime of 10 minutes is RECOMMENDED. The client MUST NOT use the authorization code more than once.
+The client MUST NOT use the authorization code more than once.
 If an authorization code is used more than once, the authorization server MUST deny the request and SHOULD revoke (when possible) all tokens previously issued based on that authorization code.
 The authorization code is bound to the client identifier and redirection URI.
 
@@ -302,13 +279,11 @@ An example successful response:
 ```
 HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
-Cache-Control: no-store
 Pragma: no-cache
 
 {
    "access_token":"2YotnFZFEjr1zCsicMWpAA",
    "token_type":"example",
-   "expires_in":3600,
    "example_parameter":"example_value"
 }
 ```
@@ -323,9 +298,6 @@ If the request failed client authentication or is invalid, the authorization ser
 The authorization server issues an access token, and constructs the response by adding the following parameters to the entity-body of the HTTP response with a 200 (OK) status code:
 
 * **access_token** REQUIRED. The access token issued by the authorization server.
-* **expires_in** RECOMMENDED. The lifetime in seconds of the access token.
-For example, the value "3600" denotes that the access token will expire in one hour from the time the response was generated.
-If omitted, the authorization server SHOULD provide the expiration time via other means or document the default value.
 * **scope** OPTIONAL, if identical to the scope requested by the client; otherwise, REQUIRED.
 The scope of the access token as described by Section [Access Token Scope](#access-token-scope).
 
@@ -335,27 +307,16 @@ Parameter names and string values are included as JSON strings.
 Numerical values are included as JSON numbers.
 The order of parameters does not matter and can vary.
 
-The authorization server MUST include the HTTP "Cache-Control"
-response header field with a value of "no-store" in any response containing tokens, credentials, or other sensitive information, as well as the "Pragma" response header field with a value of "no-cache".
-
 For example:
 
 ```
 HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
-Cache-Control: no-store
 Pragma: no-cache
 
 {
    "access_token":"2YotnFZFEjr1zCsicMWpAA",
    "token_type":"example",
-   "expires_in":3600,
    "example_parameter":"example_value"
 }
 ```
-
-## Accessing Protected Resources
-
-The client accesses protected resources by presenting the access token to the resource server.
-The resource server MUST validate the access token and ensure that it has not expired and that its scope covers the requested resource.
-The methods used by the resource server to validate the access token (as well as any error responses) are beyond the scope of this specification but generally involve an interaction or coordination between the resource server and the authorization server.
