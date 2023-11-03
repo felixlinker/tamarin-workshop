@@ -1,5 +1,10 @@
 
-# The OAuth 2.0 Authorization Framework
+# The (Simplified) OAuth 2.0 Authorization Framework
+
+## Note
+
+This specification has been altered for educational purposes.
+It presents a simplified version of OAuth 2.0 and should not be taken as reference for OAuth 2.0.
 
 ## Introduction
 
