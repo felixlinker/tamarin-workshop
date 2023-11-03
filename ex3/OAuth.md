@@ -119,8 +119,18 @@ The authorization server SHOULD document the size of any identifier it issues.
 
 ### Client Authentication
 
-The authorization server issues the registered client a client secret string to establish a client authentication method.
-The client secret string size is left undefined by this specification.
+The authorization server issues the registered client a client password to establish a client authentication method.
+The client password size is left undefined by this specification.
+The authorization server MUST support including the
+client credentials in the request-body using the following
+parameters:
+
+* **client_id** REQUIRED. The client identifier issued to the client during the registration process described by Section [Client Identifier](#client-identifier).
+* **client_secret** REQUIRED. The client secret.
+
+The parameters can only be transmitted in the request-body and MUST NOT be included in the request URI.
+
+Since client authentication method involves a password, the authorization server MUST protect any endpoint utilizing it against brute force attacks.
 
 ## Protocol Endpoints
 
