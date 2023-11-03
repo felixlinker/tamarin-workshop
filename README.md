@@ -8,8 +8,20 @@ The workshop structure is planned as follows:
 
 - 20 minute presentation: Introduction to Tamarin and live demo of minimal example (`solutions/TCP.spthy`).
 - 100 minutes: Working on exercises 1+2.
-- 15 minute presentation: How does Tamarin work? How could one proof lemmas manually?
-- Rest of the time: Working on exercises.
+- 15 minute presentation: How has Tamarin been applied in the past?
+How is it to analyze a real-world specification?
+- Rest of the time: Working on exercise 3.
+
+## Materials
+
+This repository contains the following materials.
+
+- Each folder `/ex...` contains the material for the respective exercise.
+- The folder `/solutions` contains the respective solutions.
+It contains solutions by me (Felix), but also by community members!
+- `cheatsheet.md` is an incomplete reference for the Tamarin syntax.
+- The file `Tamarin basics - dependency graphs.pdf` contains a helpful illustration of the GUI output that [Cas Cremers](https://cispa.de/en/people/cas.cremers) created.
+- Finally, Tamarin is we[ll-documented online](https://tamarin-prover.github.io/manual/master/book/001_introduction.html) ([pdf version](https://tamarin-prover.github.io/manual/master/tex/tamarin-manual.pdf)) and we encourage you to use the documentation!
 
 ## Workshop Preparation
 

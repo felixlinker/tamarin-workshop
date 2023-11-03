@@ -42,6 +42,8 @@ Make sure to prove an executability lemma that establishes that your model can b
 Think about what security properties you would expect OAuth 2.0 to provide.
 In our solution, we implemented two lemmas.
 
+If you need some inspiration, you can read the Section [Security Considerations](https://www.rfc-editor.org/rfc/rfc6749#section-10) of the original RFC.
+
 ## Step 4: Refining Everything
 
 In step 2, you made quite substantial abstractions regarding the channels used.
