@@ -212,7 +212,7 @@ It also provides an extension mechanism for defining additional grant types.
 
 ### Authorization Code Grant
 
-The authorization code grant type is used to obtain both access tokens and refresh tokens and is optimized for confidential clients.
+The authorization code grant type is used to obtain access tokens.
 Since this is a redirection-based flow, the client must be capable of interacting with the resource owner's user-agent (typically a web browser) and capable of receiving incoming requests (via redirection)
 from the authorization server.
 
@@ -241,7 +241,7 @@ from the authorization server.
 |  Client |          & Redirection URI                  |
 |         |                                             |
 |         |<---(5)----- Access Token -------------------'
-+---------+       (w/ Optional Refresh Token)
++---------+
 ```
 
 Note: The lines illustrating steps (1), (2), and (3) are broken into two parts as they pass through the user-agent.
@@ -257,7 +257,7 @@ The redirection URI includes an authorization code and any local state provided 
 When making the request, the client authenticates with the authorization server.
 The client includes the redirection URI used to obtain the authorization code for verification.
 5. The authorization server authenticates the client, validates the authorization code, and ensures that the redirection URI received matches the URI used to redirect the client in step (3).
-If valid, the authorization server responds back with an access token and, optionally, a refresh token.
+If valid, the authorization server responds back with an access token.
 
 #### Authorization Request
 
@@ -312,7 +312,6 @@ Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA
 The client makes a request to the token endpoint by sending the following parameters using the "application/x-www-form-urlencoded"
 format with a character encoding of UTF-8 in the HTTP request entity-body:
 
-* **grant_type** REQUIRED. Value MUST be set to "authorization_code".
 * **code** REQUIRED. The authorization code received from the authorization server.
 * **redirect_uri** REQUIRED, if the "redirect_uri" parameter was included in the authorization request as described in Section [Authorization Request](#authorization-request), and their values MUST be identical.
 * **client_id** REQUIRED.
@@ -355,7 +354,6 @@ Pragma: no-cache
    "access_token":"2YotnFZFEjr1zCsicMWpAA",
    "token_type":"example",
    "expires_in":3600,
-   "refresh_token":"tGzv3JOkF0XG5Qx2TlKWIA",
    "example_parameter":"example_value"
 }
 ```
@@ -367,7 +365,7 @@ If the request failed client authentication or is invalid, the authorization ser
 
 ### Successful Response
 
-The authorization server issues an access token and optional refresh token, and constructs the response by adding the following parameters to the entity-body of the HTTP response with a 200 (OK) status code:
+The authorization server issues an access token, and constructs the response by adding the following parameters to the entity-body of the HTTP response with a 200 (OK) status code:
 
 * **access_token** REQUIRED. The access token issued by the authorization server.
 * **expires_in** RECOMMENDED. The lifetime in seconds of the access token.
