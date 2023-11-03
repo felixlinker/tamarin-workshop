@@ -3,12 +3,12 @@
 
 ## Introduction
 
-OAuth introduces an authorization layer with which clients can request access to resources controlled by a resource owner and hosted by a resource server.
+OAuth introduces an authorization layer with which clients can request access to resources controlled by an end-user and hosted by a resource server.
 Using OAuth, clients obtain an access token -- a string denoting a specific scope, lifetime, and other access attributes.
-Access tokens are issued to third-party clients by an authorization server with the approval of the resource owner.
+Access tokens are issued to third-party clients by an authorization server with the approval of the end-user.
 The client uses the access token to access the protected resources hosted by the resource server.
 
-For example, an end-user (resource owner) can grant a printing service (client) access to her protected photos stored at a photo-sharing service (resource server), without sharing her username and password with the printing service.
+For example, an end-user can grant a printing service (client) access to her protected photos stored at a photo-sharing service (resource server), without sharing her username and password with the printing service.
 Instead, she authenticates directly with a server trusted by the photo-sharing service (authorization server), which issues the printing service delegation-specific credentials (access token).
 
 This specification is designed for use with HTTP.
@@ -18,78 +18,38 @@ The use of OAuth over any protocol other than HTTP is out of scope.
 
 OAuth defines four roles:
 
-* **resource owner** An entity capable of granting access to a protected resource.
-When the resource owner is a person, it is referred to as an end-user.
+* **end-user** An entity capable of granting access to a protected resource.
 * **resource server** The server hosting the protected resources, capable of accepting and responding to protected resource requests using access tokens.
-* **client** An application making protected resource requests on behalf of the resource owner and with its authorization.
+* **client** An application making protected resource requests on behalf of the end-user and with its authorization.
 The term "client" does not imply any particular implementation characteristics (e.g.,
 whether the application executes on a server, a desktop, or other devices).
-* **authorization server** The server issuing access tokens to the client after successfully authenticating the resource owner and obtaining authorization.
+* **authorization server** The server issuing access tokens to the client after successfully authenticating the end-user and obtaining authorization.
 
 The interaction between the authorization server and resource server is beyond the scope of this specification.
 The authorization server may be the same server as the resource server or a separate entity.
 A single authorization server may issue access tokens accepted by multiple resource servers.
 
-### Protocol Flow
+### Authorization Code
 
-```
-+--------+                               +---------------+
-|        |--(1)- Authorization Request ->|   Resource    |
-|        |                               |     Owner     |
-|        |<-(2)-- Authorization Grant ---|               |
-|        |                               +---------------+
-|        |
-|        |                               +---------------+
-|        |--(3)-- Authorization Grant -->| Authorization |
-| Client |                               |     Server    |
-|        |<-(4)----- Access Token -------|               |
-|        |                               +---------------+
-|        |
-|        |                               +---------------+
-|        |--(5)----- Access Token ------>|    Resource   |
-|        |                               |     Server    |
-|        |<-(6)--- Protected Resource ---|               |
-+--------+                               +---------------+
-```
+An authorization code is a credential representing the end-user's authorization (to access its protected resources) used by the client to obtain an access token.
+The authorization code is obtained by using an authorization server.
+After having obtained an authorization code, the client directs the end-user to an authorization server (via its user-agent), which in turn directs the end-user back to the client with the authorization code.
 
-The abstract OAuth 2.0 flow illustrated avoce describes the interaction between the four roles and includes the following steps:
-
-1. The client requests authorization from the resource owner.
-The authorization request can be made directly to the resource owner (as shown), or preferably indirectly via the authorization server as an intermediary.
-2. The client receives an authorization grant, which is a credential representing the resource owner's authorization,
-expressed using one of four grant types defined in this specification or using an extension grant type.
-The authorization grant type depends on the method used by the client to request authorization and the types supported by the authorization server.
-3. The client requests an access token by authenticating with the authorization server and presenting the authorization grant.
-4. The authorization server authenticates the client and validates the authorization grant, and if valid, issues an access token.
-5. The client requests the protected resource from the resource server and authenticates by presenting the access token.
-6. The resource server validates the access token, and if valid,
-serves the request.
-
-The preferred method for the client to obtain an authorization grant from the resource owner (depicted in steps (1) and (2)) is to use the authorization server as an intermediary, which is illustrated in Section [Authorization Code Grant](#authorization-code-grant).
-
-### Authorization Grant
-
-An authorization grant is a credential representing the resource owner's authorization (to access its protected resources) used by the client to obtain an access token.
-This specification defines one grant type: authorization code.
-
-#### Authorization Code
-
-The authorization code is obtained by using an authorization server as an intermediary between the client and resource owner.
-Instead of requesting authorization directly from the resource owner, the client directs the resource owner to an authorization server (via its user-agent), which in turn directs the resource owner back to the client with the authorization code.
-
-Before directing the resource owner back to the client with the authorization code, the authorization server authenticates the resource owner and obtains authorization.
-Because the resource owner only authenticates with the authorization server, the resource owner's credentials are never shared with the client.
+Before directing the end-user back to the client with the authorization code, the authorization server authenticates the end-user and obtains authorization.
+Because the end-user only authenticates with the authorization server, the end-user's credentials are never shared with the client.
 
 ### Access Token
 
 Access tokens are credentials used to access protected resources.
 An access token is a string representing an authorization issued to the client.
 The string is usually opaque to the client.
-Tokens represent specific scopes and durations of access, granted by the resource owner, and enforced by the resource server and authorization server.
+Tokens represent specific scopes and durations of access, granted by the end-user, and enforced by the resource server and authorization server.
 
 ### TLS
 
-Implementations MUST use Transport Layer Security (TLS) whenever they establish connections of any kind.
+<!-- TODO: Phrase this better -->
+
+Implementations MUST always use Transport Layer Security (TLS) and `https://` redirect URIs respectively.
 
 # Client Registration
 
@@ -110,7 +70,7 @@ OAuth assumes clients capable of maintaining the confidentiality of shared secre
 ### Client Identifier
 
 The authorization server issues the registered client a client identifier -- a unique string representing the registration information provided by the client.
-The client identifier is not a secret; it is exposed to the resource owner and MUST NOT be used alone for client authentication.
+The client identifier is not a secret; it is exposed to the end-user and MUST NOT be used alone for client authentication.
 The client identifier is unique to the authorization server.
 
 The client identifier string size is left undefined by this specification.
@@ -136,17 +96,17 @@ Since client authentication method involves a password, the authorization server
 
 The authorization process utilizes two authorization server endpoints (HTTP resources):
 
-* Authorization endpoint - used by the client to obtain authorization from the resource owner via user-agent redirection.
+* Authorization endpoint - used by the client to obtain authorization from the end-user via user-agent redirection.
 * Token endpoint - used by the client to exchange an authorization grant for an access token, typically with client authentication.
 
 As well as one client endpoint:
 
-* Redirection endpoint - used by the authorization server to return responses containing authorization credentials to the client via the resource owner user-agent.
+* Redirection endpoint - used by the authorization server to return responses containing authorization credentials to the client via the end-user user-agent.
 
 ### Authorization Endpoint
 
-The authorization endpoint is used to interact with the resource owner and obtain an authorization grant.
-The authorization server MUST first verify the identity of the resource owner by verifying the client secret established in [Client Authentication](#client-authentication).
+The authorization endpoint is used to interact with the end-user and obtain an authorization grant.
+The authorization server MUST first verify the identity of the end-user by verifying the client secret established in [Client Authentication](#client-authentication).
 
 #### Response Type
 
@@ -157,7 +117,7 @@ The client informs the authorization server of the desired grant type using the 
 
 #### Redirection Endpoint
 
-After completing its interaction with the resource owner, the authorization server directs the resource owner's user-agent back to the client.
+After completing its interaction with the end-user, the authorization server directs the end-user's user-agent back to the client.
 The authorization server redirects the user-agent to the client's redirection endpoint previously established with the authorization server during the client registration process or when making the authorization request.
 
 ##### Registration Requirements
@@ -178,8 +138,7 @@ If the client registration included the full redirection URI, the authorization 
 
 ##### Invalid Endpoint
 
-If an authorization request fails validation due to a missing,
-invalid, or mismatching redirection URI, the authorization server SHOULD inform the resource owner of the error and MUST NOT automatically redirect the user-agent to the invalid redirection URI.
+If an authorization request fails validation due to a missing, invalid, or mismatching redirection URI, the authorization server SHOULD inform the end-user of the error and MUST NOT automatically redirect the user-agent to the invalid redirection URI.
 
 ### Token Endpoint
 
@@ -204,16 +163,13 @@ The value of the scope parameter is expressed as a list of space-delimited, case
 
 ## Obtaining Authorization
 
-To request an access token, the client obtains authorization from the resource owner.
-The authorization is expressed in the form of an authorization grant, which the client uses to request the access token.
-OAuth defines four grant types: authorization code, implicit,
-resource owner password credentials, and client credentials.
-It also provides an extension mechanism for defining additional grant types.
+To request an access token, the client obtains authorization from the end-user.
+The authorization is expressed in the form of an authorization code, which the client uses to request the access token.
 
 ### Authorization Code Grant
 
 The authorization code grant type is used to obtain access tokens.
-Since this is a redirection-based flow, the client must be capable of interacting with the resource owner's user-agent (typically a web browser) and capable of receiving incoming requests (via redirection)
+Since this is a redirection-based flow, the client must be capable of interacting with the end-user's user-agent (typically a web browser) and capable of receiving incoming requests (via redirection)
 from the authorization server.
 
 ```
@@ -248,10 +204,10 @@ Note: The lines illustrating steps (1), (2), and (3) are broken into two parts a
 
 The flow illustrated above includes the following steps:
 
-1. The client initiates the flow by directing the resource owner's user-agent to the authorization endpoint.
+1. The client initiates the flow by directing the end-user's user-agent to the authorization endpoint.
 The client includes its client identifier, requested scope, local state, and a redirection URI to which the authorization server will send the user-agent back once access is granted (or denied).
-2. The authorization server authenticates the resource owner (via the user-agent) and establishes whether the resource owner grants or denies the client's access request.
-3. Assuming the resource owner grants access, the authorization server redirects the user-agent back to the client using the redirection URI provided earlier (in the request or during client registration).
+2. The authorization server authenticates the end-user (via the user-agent) and establishes whether the end-user grants or denies the client's access request.
+3. Assuming the end-user grants access, the authorization server redirects the user-agent back to the client using the redirection URI provided earlier (in the request or during client registration).
 The redirection URI includes an authorization code and any local state provided by the client earlier.
 4. The client requests an access token from the authorization server's token endpoint by including the authorization code received in the previous step.
 When making the request, the client authenticates with the authorization server.
@@ -270,7 +226,7 @@ The client constructs the request URI by adding the following parameters to the 
 The authorization server includes this value when redirecting the user-agent back to the client.
 The parameter SHOULD be used for preventing cross-site request forgery.
 
-The client directs the resource owner to the constructed URI using an HTTP redirection response, or by other means available to it via the user-agent.
+The client directs the end-user to the constructed URI using an HTTP redirection response, or by other means available to it via the user-agent.
 
 For example, the client directs the user-agent to make the following HTTP request using TLS (with extra line breaks for display purposes only):
 
@@ -281,14 +237,13 @@ Host: server.example.com
 ```
 
 The authorization server validates the request to ensure that all required parameters are present and valid.
-If the request is valid,
-the authorization server authenticates the resource owner and obtains an authorization decision (by asking the resource owner or by establishing approval via other means).
+If the request is valid, the authorization server authenticates the end-user and obtains an authorization decision (by asking the end-user or by establishing approval via other means).
 
 When a decision is established, the authorization server directs the user-agent to the provided client redirection URI using an HTTP redirection response, or by other means available to it via the user-agent.
 
 #### Authorization Response
 
-If the resource owner grants the access request, the authorization server issues an authorization code and delivers it to the client by adding the following parameters to the query component of the redirection URI using the "application/x-www-form-urlencoded" format:
+If the end-user grants the access request, the authorization server issues an authorization code and delivers it to the client by adding the following parameters to the query component of the redirection URI using the "application/x-www-form-urlencoded" format:
 
 * **code** REQUIRED. The authorization code generated by the authorization server.
 The authorization code MUST expire shortly after it is issued to mitigate the risk of leaks.
@@ -339,7 +294,7 @@ The authorization server MUST:
 
 #### Access Token Response
 
-If the access token request is valid and authorized, the authorization server issues an access token.
+If the access token request is valid and authorized, the authorization server issues an access token as described in Section [Issuing an Access Token](#issuing-an-access-token).
 If the request client authentication failed or is invalid, the authorization server returns an error response.
 
 An example successful response:
