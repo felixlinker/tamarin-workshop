@@ -1,0 +1,96 @@
+theory OAuthAfterStep3
+begin
+
+/** Secure channel model (begin) */
+
+rule SecureChannelSend:
+  [ OutSecure($From, $To, m) ]
+  -->
+  [ !Sec($From, $To, m) ]
+
+rule SecureChannelReceive:
+  [ !Sec($From, $To, m) ]
+  -->
+  [ InSecure($From, $To, m) ]
+
+/** Secure channel model (end) */
+
+// Registration
+
+rule AuthServer:
+  [] --> [ !AuthServer($Server, $AuthEndpoint, $TokenEndpoint) ]
+
+rule Client:
+  [] --> [ !Client($Client) ]
+
+rule Registration:
+  [ !AuthServer($Server, $AuthEndpoint, $TokenEndpoint)
+  , !Client($Client)
+  , Fr(~sharedSecret) ]
+  -->
+  [ !Registration($Server, $Client, ~sharedSecret) ]
+
+rule RedirectURI:
+  [ !Registration($Server, $Client, ~sharedSecret) ]
+  -->
+  [ !RedirectURI($Server, $Client, $URI) ]
+
+rule SharedSecretLeak:
+  [ !Registration($Server, $Client, ~sharedSecret) ]
+  --[ CompromisedSecret($Server, $Client) ]->
+  [ Out(~sharedSecret) ]
+
+rule AuthorizationRequest:
+  [ !AuthServer($Server, $AuthEndpoint, $TokenEndpoint)
+  , !Registration($Server, $Client, ~sharedSecret)
+  , !RedirectURI($Server, $Client, $URI)
+  , Fr(~state) ]
+  --[ RequestToken($Client, $Server, $Scope) ]->
+  [ OutSecure($Client, $AuthEndpoint, <'auth_req', $Client, $URI, $Scope, ~state>)
+  , St_ClientAuthRequested($Client, $Server, $URI, ~state) ]
+
+rule AuthorizationResponse:
+  [ !AuthServer($Server, $AuthEndpoint, $TokenEndpoint)
+  , !Registration($Server, $Client, ~sharedSecret)
+  , !RedirectURI($Server, $Client, $URI)
+  , InSecure($Client, $AuthEndpoint, <'auth_req', $Client, $URI, $Scope, state>)
+  , Fr(~code) ]
+  -->
+  [ OutSecure($AuthEndpoint, $URI, <'auth_response', ~code, state>)
+  , St_AuthServerResponded($Server, $Client, $URI, $Scope, ~code) ]
+
+rule AccessTokenRequest:
+  [ !AuthServer($Server, $AuthEndpoint, $TokenEndpoint)
+  , !Registration($Server, $Client, ~sharedSecret)
+  , St_ClientAuthRequested($Client, $Server, $URI, ~state)
+  , InSecure($AuthEndpoint, $URI, <'auth_response', code, ~state>) ]
+  -->
+  [ OutSecure($Client, $TokenEndpoint, <'token_request', $Client, code, ~sharedSecret>)
+  , St_ClientTokenRequest($Client, $Server) ]
+
+rule AccessTokenResponse:
+  [ !AuthServer($Server, $AuthEndpoint, $TokenEndpoint)
+  , !Registration($Server, $Client, ~sharedSecret)
+  , St_AuthServerResponded($Server, $Client, $URI, $Scope, ~code)
+  , InSecure($Client, $TokenEndpoint, <'token_request', $Client, ~code, ~sharedSecret>)
+  , Fr(~token) ]
+  --[ IssueToken($Server, $Client, $Scope, ~token) ]->
+  [ OutSecure($TokenEndpoint, $Client, <'token', ~token>) ]
+
+lemma Executability:
+  exists-trace
+  "Ex client server scope token #x #y.
+      RequestToken(client, server, scope) @ #x
+    & IssueToken(server, client, scope, token) @ #y"
+
+lemma TokenSecrecy:
+  "All server client scope t #x.
+        IssueToken(server, client, scope, t) @ #x
+    ==> (not Ex #y. K(t) @ #y)"
+
+lemma Agreement:
+  "All server client scope t #x.
+        IssueToken(server, client, scope, t) @ #x
+    ==> (Ex #y. RequestToken(client, server, scope) @ #y)"
+
+end

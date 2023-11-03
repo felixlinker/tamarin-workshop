@@ -1,0 +1,145 @@
+theory OAuthAfterStep4
+begin
+
+/** Secure channel model (begin) */
+
+rule SecureChannelSend:
+  [ OutSecure($From, $To, m) ]
+  -->
+  [ !Sec($From, $To, m) ]
+
+rule AdversarySecureChannelSend:
+  [ In(m), !Compromised($From) ]
+  -->
+  [ InSecure($From, $To, m) ]
+
+rule SecureChannelReceive:
+  [ !Sec($From, $To, m) ]
+  -->
+  [ InSecure($From, $To, m) ]
+
+rule AdversarySecureReceive:
+  [ !Sec($From, $To, m), !Compromised($To) ]
+  -->
+  [ Out(m) ]
+
+rule ConfidentialChannelSend:
+  [ OutConfidential($To, m) ]
+  -->
+  [ !Conf($To, m) ]
+
+rule AdversaryConfidentialChannelSend:
+  [ In(m) ]
+  -->
+  [ InConfidential($To, m) ]
+
+rule ConfidentialChannelReceive:
+  [ !Conf($To, m) ]
+  -->
+  [ InConfidential($To, m) ]
+
+rule AdversaryConfidentialReceive:
+  [ !Conf($To, m), !Compromised($To) ]
+  -->
+  [ Out(m) ]
+
+/** Secure channel model (end) */
+
+// Registration
+
+rule AuthServer:
+  []
+  --[ AssumeUncompromised($AuthEndpoint)
+    , AssumeUncompromised($TokenEndpoint) ]->
+    [ !AuthServer($Server, $AuthEndpoint, $TokenEndpoint) ]
+
+restriction AssumeUncompromised:
+  "All client #x.
+        AssumeUncompromised(client) @ #x
+    ==> (not Ex #y. IsCompromised(client) @ #y)"
+
+rule Client:
+  [] --> [ !Client($Client) ]
+
+rule ClientCompromise:
+  [ !Client($Client) ] --[ IsCompromised($Client) ]-> [ !Compromised($Client) ]
+
+rule Registration:
+  [ !AuthServer($Server, $AuthEndpoint, $TokenEndpoint)
+  , !Client($Client)
+  , Fr(~sharedSecret) ]
+  -->
+  [ !Registration($Server, $Client, ~sharedSecret) ]
+
+rule RedirectURI:
+  [ !Registration($Server, $Client, ~sharedSecret) ]
+  --[ IsRedirectURI($Server, $Client, $URI) ]->
+  [ !RedirectURI($Server, $Client, $URI) ]
+
+rule SharedSecretLeak:
+  [ !Registration($Server, $Client, ~sharedSecret) ]
+  --[ CompromisedSecret($Server, $Client) ]->
+  [ Out(~sharedSecret) ]
+
+rule AuthorizationRequest:
+  [ !AuthServer($Server, $AuthEndpoint, $TokenEndpoint)
+  , !Registration($Server, $Client, ~sharedSecret)
+  , !RedirectURI($Server, $Client, $URI)
+  , Fr(~state) ]
+  --[ RequestToken($Client, $Server, $Scope) ]->
+  [ OutConfidential($AuthEndpoint, <'auth_req', $Client, $URI, $Scope, ~state>)
+  , St_ClientAuthRequested($Client, $Server, $URI, ~state) ]
+
+rule AuthorizationResponse:
+  [ !AuthServer($Server, $AuthEndpoint, $TokenEndpoint)
+  , !Registration($Server, $Client, ~sharedSecret)
+  , !RedirectURI($Server, $Client, $URI)
+  , InConfidential($AuthEndpoint, <'auth_req', $Client, $URI, $Scope, state>)
+  , Fr(~code) ]
+  -->
+  [ OutConfidential($URI, <'auth_response', ~code, state>)
+  , St_AuthServerResponded($Server, $Client, $URI, $Scope, ~code) ]
+
+rule AccessTokenRequest:
+  [ !AuthServer($Server, $AuthEndpoint, $TokenEndpoint)
+  , !Registration($Server, $Client, ~sharedSecret)
+  , !Client($TmpClient)
+  , St_ClientAuthRequested($Client, $Server, $URI, ~state)
+  , InConfidential($URI, <'auth_response', code, ~state>) ]
+  --[ AssumeUncompromised($TmpClient) ]->
+  [ OutSecure($TmpClient, $TokenEndpoint, <'token_request', $Client, $URI, code, ~sharedSecret>)
+  , St_ClientTokenRequest($Client, $Server) ]
+
+rule AccessTokenResponse:
+  [ !AuthServer($Server, $AuthEndpoint, $TokenEndpoint)
+  , !Registration($Server, $Client, ~sharedSecret)
+  , St_AuthServerResponded($Server, $Client, $URI, $Scope, ~code)
+  , InSecure($TmpClient, $TokenEndpoint, <'token_request', $Client, $URI, ~code, ~sharedSecret>)
+  , Fr(~token) ]
+  --[ IssueToken($Server, $Client, $Scope, ~token) ]->
+  [ OutSecure($Client, $TmpClient, <'token', ~token>) ]
+
+lemma Executability:
+  exists-trace
+  "Ex client server scope token #x #y.
+      RequestToken(client, server, scope) @ #x
+    & IssueToken(server, client, scope, token) @ #y"
+
+lemma TokenSecrecy:
+  "All server client scope t #x.
+        IssueToken(server, client, scope, t) @ #x
+    ==>   (not Ex #y. K(t) @ #y)
+        | (Ex uri #z1 #z2 #z3.
+              IsRedirectURI(server, client, uri) @ #z1
+            & IsCompromised(uri) @ #z2
+            & CompromisedSecret(server, client) @ #z3)"
+
+lemma Agreement:
+  "All server client scope t #x.
+        IssueToken(server, client, scope, t) @ #x
+    ==>   (Ex #y. RequestToken(client, server, scope) @ #y)
+        | (Ex uri #z1 #z2.
+              IsRedirectURI(server, client, uri) @ #z1
+            & IsCompromised(uri) @ #z2)"
+
+end

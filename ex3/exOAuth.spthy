@@ -1,0 +1,22 @@
+theory OAuth
+begin
+
+/** Secure channel model (begin) */
+
+rule SecureChannelSend:
+  [ OutSecure($From, $To, m) ]
+  -->
+  [ !Sec($From, $To, m) ]
+
+rule SecureChannelReceive:
+  [ !Sec($From, $To, m) ]
+  -->
+  [ InSecure($From, $To, m) ]
+
+/** Secure channel model (end) */
+
+/**
+ * ...put your model here...
+ */
+
+end
