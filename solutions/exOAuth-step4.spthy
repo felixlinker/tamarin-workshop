@@ -44,7 +44,10 @@ rule AdversaryConfidentialReceive:
   [ Out(m) ]
 
 rule PartyCompromise:
-  [] --[ IsCompromised($Client) ]-> [ !Compromised($Client) ]
+  []
+  --[ IsCompromised($Client)
+    , SomeCompromise() ]->
+  [ !Compromised($Client) ]
 
 /** Secure channel model (end) */
 
@@ -73,7 +76,8 @@ rule RedirectURI:
 
 rule SharedSecretLeak:
   [ !Registration($Server, $Client, ~sharedSecret) ]
-  --[ CompromisedSecret($Server, $Client) ]->
+  --[ CompromisedSecret($Server, $Client)
+    , SomeCompromise() ]->
   [ Out(~sharedSecret) ]
 
 rule AuthorizationRequest:
@@ -123,7 +127,8 @@ lemma Executability:
   exists-trace
   "Ex client server scope token #x #y.
       RequestToken(client, server, scope) @ #x
-    & IssueToken(server, client, scope, token) @ #y"
+    & IssueToken(server, client, scope, token) @ #y
+    & (not Ex #z. SomeCompromise() @ #z)"
 
 lemma TokenSecrecy:
   "All server client scope t #x.
