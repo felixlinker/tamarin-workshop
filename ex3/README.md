@@ -32,7 +32,7 @@ We **suggest** making the following abstractions:
 
 - Use a secure channel for messages sent from and to clients.
 You will refine your model later in step 4!
-- Model the authorization server perfectly authentication users.
+- Model the authorization server perfectly authenticating users.
 - Do not model how access tokens are used, only how they are obtained.
 
 Make sure to prove an executability lemma that establishes that your model can be executed.
