@@ -39,7 +39,7 @@ Complete reference: [link](https://tamarin-prover.github.io/manual/master/book/0
 Define function `senc` with 2 arguments and `sdec` with 2 arguments:
 
 ```tamarin
-functions: senc/1, sdec/2
+functions: senc/2, sdec/2
 ```
 
 Define equation for aforementioned functions:

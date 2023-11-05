@@ -61,3 +61,7 @@ Then, write a new `SecrecyWeakened` expressing:
 
 Try verifying this lemma.
 Which result would you expect?
+
+Should you see an error that involves the word "guardedness," your lemma is not of the form that Tamarin expects.
+For many participants in this exercise, it is sufficient to be more explicit about your parentheses.
+If this is not enough, please raise your hand during the workshop or read the [full documentation on guardedness](https://tamarin-prover.github.io/manual/master/book/007_property-specification.html#guardedness).

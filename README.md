@@ -69,3 +69,5 @@ tamarin-prover interactive ex1/
 
 Make sure that you check the output for warnings.
 If there are none, navigate to http://127.0.0.1:3001 to see the GUI.
+
+Note that you need to restart Tamarin whenever you changed your model (i.e., you changed a `*.spthy` file)!
