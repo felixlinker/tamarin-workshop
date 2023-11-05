@@ -20,6 +20,7 @@ This repository contains the following materials.
 - The folder `/solutions` contains the respective solutions.
 It contains solutions by me (Felix), but also by community members!
 - `cheatsheet.md` is an incomplete reference for the Tamarin syntax.
+- The file `slides.pdf` is the most up-to-date slide-set that I use to introduce this workshop's exercises.
 - The file `Tamarin basics - dependency graphs.pdf` contains a helpful illustration of the GUI output that [Cas Cremers](https://cispa.de/en/people/cas.cremers) created.
 - Finally, Tamarin is [well-documented online](https://tamarin-prover.github.io/manual/master/book/001_introduction.html) ([pdf version](https://tamarin-prover.github.io/manual/master/tex/tamarin-manual.pdf)) and we encourage you to use the documentation!
 
