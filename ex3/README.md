@@ -57,6 +57,7 @@ Now, think about the following:
 - The secure channel model did not allow for adversary activity at all.
 It might be desirable that the adversary can send or receive on the secure channel when they compromised some endpoints.
 Implement rules that allow the adversary to do so, and rules that allow for the compromise of endpoints.
+Remember to strengthen your executability lemma s.t. it forbids any form of compromise (the goal of the lemma is to establish that the protocol can be executed *without* adversary involvement).
 - Which channels are used between the client, authorization endpoint, redirection endpoint, and token endpoint in the specification?
 Are they secure?
 Are they only confidential (everyone can send, but not only the intended recipient receive)?
