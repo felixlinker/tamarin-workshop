@@ -43,26 +43,21 @@ rule AdversaryConfidentialReceive:
   -->
   [ Out(m) ]
 
+rule PartyCompromise:
+  [] --[ IsCompromised($Client) ]-> [ !Compromised($Client) ]
+
 /** Secure channel model (end) */
 
 // Registration
 
 rule AuthServer:
   []
-  --[ AssumeUncompromised($AuthEndpoint)
-    , AssumeUncompromised($TokenEndpoint) ]->
+  --[ IsAuthEndpoint($Server, $AuthEndpoint)
+    , IsTokenEndpoint($Server, $TokenEndpoint) ]->
     [ !AuthServer($Server, $AuthEndpoint, $TokenEndpoint) ]
-
-restriction AssumeUncompromised:
-  "All client #x.
-        AssumeUncompromised(client) @ #x
-    ==> (not Ex #y. IsCompromised(client) @ #y)"
 
 rule Client:
   [] --> [ !Client($Client) ]
-
-rule ClientCompromise:
-  [ !Client($Client) ] --[ IsCompromised($Client) ]-> [ !Compromised($Client) ]
 
 rule Registration:
   [ !AuthServer($Server, $AuthEndpoint, $TokenEndpoint)
@@ -110,6 +105,11 @@ rule AccessTokenRequest:
   [ OutSecure($TmpClient, $TokenEndpoint, <'token_request', $Client, $URI, code, ~sharedSecret>)
   , St_ClientTokenRequest($Client, $Server) ]
 
+restriction AssumeUncompromised:
+  "All client #x.
+        AssumeUncompromised(client) @ #x
+    ==> (not Ex #y. IsCompromised(client) @ #y)"
+
 rule AccessTokenResponse:
   [ !AuthServer($Server, $AuthEndpoint, $TokenEndpoint)
   , !Registration($Server, $Client, ~sharedSecret)
@@ -129,17 +129,38 @@ lemma TokenSecrecy:
   "All server client scope t #x.
         IssueToken(server, client, scope, t) @ #x
     ==>   (not Ex #y. K(t) @ #y)
-        | (Ex uri #z1 #z2 #z3.
-              IsRedirectURI(server, client, uri) @ #z1
-            & IsCompromised(uri) @ #z2
-            & CompromisedSecret(server, client) @ #z3)"
+        | (Ex uri #y1 #y2 #y3.
+              IsRedirectURI(server, client, uri) @ #y1
+            & IsCompromised(uri) @ #y2
+            & CompromisedSecret(server, client) @ #y3)
+        | (Ex aep #y1 #y2 #y3.
+              IsCompromised(aep) @ #y1
+            & IsAuthEndpoint(server, aep) @ #y2
+            & CompromisedSecret(server, client) @ #y3)
+        | (Ex tep #y1 #y2.
+              IsCompromised(tep) @ #y1
+            & IsTokenEndpoint(server, tep) @ #y2)
+        | (Ex server2 client2 uri #y1 #y2.
+              IsRedirectURI(server, client, uri) @ #y1
+            & IsRedirectURI(server2, client2, uri) @ #y2
+            & not (server = server2))"
 
 lemma Agreement:
   "All server client scope t #x.
         IssueToken(server, client, scope, t) @ #x
     ==>   (Ex #y. RequestToken(client, server, scope) @ #y)
-        | (Ex uri #z1 #z2.
-              IsRedirectURI(server, client, uri) @ #z1
-            & IsCompromised(uri) @ #z2)"
+        | (Ex uri #y1 #y2.
+              IsRedirectURI(server, client, uri) @ #y1
+            & IsCompromised(uri) @ #y2)
+        | (Ex tep #y1 #y2.
+              IsCompromised(tep) @ #y1
+            & IsTokenEndpoint(server, tep) @ #y2)
+        | (Ex aep #y1 #y2.
+              IsCompromised(aep) @ #y1
+            & IsAuthEndpoint(server, aep) @ #y2)
+        | (Ex server2 client2 uri #y1 #y2.
+              IsRedirectURI(server, client, uri) @ #y1
+            & IsRedirectURI(server2, client2, uri) @ #y2
+            & not (server = server2))"
 
 end
