@@ -24,6 +24,14 @@ It contains solutions by me (Felix), but also by community members!
 - The file `Tamarin basics - dependency graphs.pdf` contains a helpful illustration of the GUI output that [Cas Cremers](https://cispa.de/en/people/cas.cremers) created.
 - Finally, Tamarin is [well-documented online](https://tamarin-prover.github.io/manual/master/book/001_introduction.html) ([pdf version](https://tamarin-prover.github.io/manual/master/tex/tamarin-manual.pdf)) and we encourage you to use the documentation!
 
+### Recording
+
+This workshop has held as part of the IETF 118 in Prague.
+A recording of my presentations is available on YouTube!
+
+- [Presentation introducing exercises 1 + 2](https://youtu.be/14ZsKL705kg?si=ybgFLdqRk_26lECH&t=143)
+- [Presentation introducing exercise 3](https://youtu.be/14ZsKL705kg?si=c-bZg80qZg-ixH4L&t=7487)
+
 ## Workshop Preparation
 
 If you plan to attend this workshop in person, we suggest that you:
