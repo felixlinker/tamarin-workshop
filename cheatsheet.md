@@ -64,7 +64,9 @@ Complete reference: [link](https://tamarin-prover.github.io/manual/master/book/0
 
 - `All v. p`: For all `v`, `p` holds
 - `Ex v. p`: For some `v`, `p` holds
-- `L(t1) @ #x`: Action fact `L` occurs at timepoint `#x`
+- `L(t1, ...) @ #x`: Action fact `L` occurs at timepoint `#x` with arguments `t1, ...`
+  - You can use the reserved action fact `K(x)` to express that the adversary knows term `x`.
+  - Sometimes, you may also need to use `KU(x)` in auxiliary lemmas. `KU` means that the adversary used term `x` to construct a message.
 - `#i < #j`: Timepoint `#i` is smaller than timepoint `#j`
 - `t1 = t2` / `#i = #j`: Terms (or timepoints) are equal
 - Standard logical operands: `p & q`, `p | q`, `not p`,`p ==> q` (equivalent to `p | not q`)
