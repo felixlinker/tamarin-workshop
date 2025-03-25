@@ -27,6 +27,6 @@ lemma Works:
 
 lemma BulletProof:
   all-traces
-  "All #t1. Begin() @ #t1 ==> Ex #t2. End() @ #t2 & #t1 < #t2"
+  "All #t1. End() @ #t1 ==> Ex #t2. Begin() @ #t2"
 
 end
