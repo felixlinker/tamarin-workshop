@@ -1,0 +1,23 @@
+theory Colors
+begin
+
+rule Start:
+  [] --[ Start() ]-> [ Green(), Blue() ]
+
+rule AddRed:
+  [ Green(), Blue() ] --[ RedAdded() ]-> [ Red() ]
+
+rule AddYellow:
+  [ Blue(), Red() ] --[ YellowAdded() ]-> [ Yellow() ]
+
+lemma YellowReachable:
+  exists-trace
+  "Ex #x. YellowAdded() @ #x"
+
+lemma YellowRequiresRed:
+  "All #x. YellowAdded() @ #x ==> Ex #y. RedAdded() @ #y"
+
+lemma RedRequiresStart:
+  "All #x. RedAdded() @ #x ==> Ex #y. Start() @ #y"
+
+end
