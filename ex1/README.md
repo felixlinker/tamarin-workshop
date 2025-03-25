@@ -29,7 +29,7 @@ Fill the rule `SendMsg` with life!
 At the end, participant `$A` should send message `~m` symmetrically encrypted under their previously generated key.
 
 When you do so, uncomment the `MessageWasSent` fact in the rule's label.
-Note that this means the variables `$A` and `~msg` must come from somewhere.
+Note that this means the variables `$A` and `~msg` must be defined in the rule's left- or right-hand side.
 
 Once you have implemented the rule, load the interactive mode of Tamarin and try verifying the `Secrecy` lemma.
 Does it hold?
@@ -39,7 +39,7 @@ What would you expect?
 
 It is a common modelling pattern in Tamarin to include a rule that leaks a participant's key.
 Usually, this is done to model more granular notions of compromise.
-Sometimes, certain security properties hold if only some types of keys are not leaked but others may leak.
+Sometimes, certain security properties hold if only some types of keys are not leaked, but others may leak.
 
 Model a new rule `Leak` that leaks a previously generated key to the adversary.
 
