@@ -20,6 +20,8 @@ The workshop structure is planned as follows:
 How is it to analyze a real-world specification?
 - Rest of the time: Working on exercise 3.
 
+Need help hosting a Tamarin workshop? [Reach out to me!](https://felixlinker.de/contact/)
+
 ## Materials
 
 This repository contains the following materials.
