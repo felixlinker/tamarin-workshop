@@ -62,11 +62,11 @@ If you want to use syntax highlighting, we suggest using [Visual Studio Code](ht
 There is also syntax highlighting for [Sublime Text 3](https://github.com/tamarin-prover/editor-sublime) available.
 You can install syntax highlighting using "Package Control."
 
-### Manually
+### Manually on Linux
 
 1. Install graphviz: `sudo apt install graphviz`
 2. Install [Maude](https://github.com/SRI-CSL/Maude/releases/tag/Maude3.3.1) (click link, download, unzip, and put on path). Note: rename `maude.linux` to `maude`.
-3. Install [Tamarin](https://github.com/tamarin-prover/tamarin-prover/releases/tag/1.8.0) (click link, download `tamarin-prover-1.8.0-linux64-ubuntu.tar.gz`, unzip, and put on path).
+3. Install [Tamarin](https://github.com/tamarin-prover/tamarin-prover/releases) (follow link, download `tamarin-prover-XXXX-linux64-ubuntu.tar.gz`, unzip, and put on path).
 
 ### Using Brew
 
